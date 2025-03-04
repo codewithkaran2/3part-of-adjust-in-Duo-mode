@@ -106,8 +106,8 @@
     .mode-button, .button-container button {
       position: relative;
       overflow: hidden;
-      padding: 14px 25px;
-      font-size: 1.2rem;
+      padding: 16px 30px;
+      font-size: 1.5rem;
       border: none;
       border-radius: 12px;
       cursor: pointer;
@@ -143,10 +143,10 @@
       background: var(--button-hover);
     }
     
-    /* Updated Input Field Styling to Remove White Box */
+    /* Updated Input Field Styling to Remove White Box and Increase Font Size */
     .name-container input {
       padding: 12px 18px;
-      font-size: 1.1rem;
+      font-size: 1.5rem;
       border: none;
       border-bottom: 2px solid var(--input-focus-border);
       background: transparent;
@@ -158,8 +158,13 @@
     
     /* New CSS for Health Bar and Shield indicators */
     .health-bar, .shield-indicator {
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+      text-align: center;
     }
     
     /* Canvas styling */
@@ -204,30 +209,31 @@
     /* Volume container styling */
     #volumeContainer { margin: 15px auto; }
     
-    /* New styling for player controls positioned relative to canvas */
-    #canvasContainer {
-      position: relative;
-      display: inline-block;
+    /* Player Controls styling */
+    #playerControls {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1600px;
+      margin: 20px auto;
     }
-    .player-control {
-      position: absolute;
+    .control-box {
       background: var(--input-bg);
       border: 2px solid var(--input-focus-border);
       border-radius: 10px;
-      padding: 10px;
+      padding: 20px;
       color: var(--font-color);
       font-size: 1.2rem;
-      width: 250px;
+      width: 300px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
-    #playerControlLeft {
-      left: 20px;
-      bottom: 20px;
-      text-align: left;
+    .control-box h3 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
     }
-    #playerControlRight {
-      right: 20px;
-      bottom: 20px;
-      text-align: right;
+    .control-box p {
+      margin: 5px 0;
     }
     
     /* Responsive design adjustments */
@@ -235,12 +241,7 @@
       .rainbow-title { font-size: 2rem; }
       canvas { width: 90%; height: auto; }
       #volumeSlider { width: 80%; }
-      /* For responsive, adjust player controls positioning if needed */
-      #playerControlLeft, #playerControlRight {
-        position: static;
-        margin: 10px auto;
-        width: auto;
-      }
+      #playerControls { flex-direction: column; align-items: center; }
     }
   </style>
 </head>
@@ -278,28 +279,31 @@
   <div id="gameOverScreen" class="overlay hidden" role="dialog" aria-labelledby="gameOverTitle">
     <h1 id="gameOverTitle"><span id="winnerName">Player Name</span>🏆!</h1>
     <div class="button-container">
-      <button onclick="restartGame()">Restart Game</button>
+      <!-- Play Again now replays the selected mode rather than restarting to main page -->
+      <button onclick="playAgain()">Play Again!</button>
     </div>
   </div>
   
-  <!-- Canvas Container with Player Controls positioned over the canvas -->
-  <div id="canvasContainer">
-    <canvas id="gameCanvas" width="1600" height="900"></canvas>
-    <div id="playerControlLeft" class="player-control">
-      <h3>Player 1</h3>
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas" width="1600" height="900"></canvas>
+  
+  <!-- Player Controls moved below canvas -->
+  <div id="playerControls">
+    <div class="control-box">
+      <h3>🟦Player 1🎮:</h3>
       <p>W, A, S, D - Move</p>
       <p>SPACE - Shoot</p>
-      <p>Q - Shield</p>
+      <p>Q - 🛡️Shield</p>
     </div>
-    <div id="playerControlRight" class="player-control">
-      <h3>Player 2</h3>
+    <div class="control-box">
+      <h3>🟥Player 2🎮:</h3>
       <p>Arrow Keys - Move</p>
       <p>ENTER - Shoot</p>
-      <p>M - Shield</p>
+      <p>M - 🛡️Shield</p>
     </div>
   </div>
   
-  <!-- Game Control Buttons (placed below canvas) -->
+  <!-- Game Control Buttons (placed below player controls) -->
   <div id="controlsContainer" class="control-container">
     <button onclick="toggleFullScreen()">Full Screen</button>
     <button onclick="togglePause()">Pause</button>
@@ -319,7 +323,7 @@
   <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
   <audio id="shieldBreakSound" src="https://actions.google.com/sounds/v1/impulse/metal_hit.ogg" preload="auto"></audio>
   
-  <!-- Inline script to prevent space key scrolling -->
+  <!-- Inline script to prevent space key scrolling (fixes issue #2) -->
   <script>
     document.addEventListener('keydown', function(e) {
       if (e.code === 'Space' && e.target === document.body) {
@@ -327,6 +331,8 @@
       }
     });
   </script>
+  
+  <!-- Placeholder: Shield glitch fix is now handled within duoMode.js to ensure shield activation is visible -->
   
   <!-- External JavaScript files loaded with defer -->
   <script src="main.js" defer></script>
