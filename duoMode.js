@@ -78,7 +78,6 @@ function startBackgroundMusic() {
 /* --------------------------
    PLAYER DEFINITIONS (DUO MODE)
 ----------------------------- */
-// Increased size from 40 to 60 for better visibility.
 const player1 = {
   x: 100,
   y: 0, // Set during drop animation
@@ -210,7 +209,7 @@ function movePlayers() {
     player2.y = oldP2.y;
   }
   
-  // Update shield status – each player's shield is toggled directly via its key (q for Player1, m for Player2)
+  // Update shield status – each player's shield is toggled via its key (q for Player1, m for Player2)
   player1.shieldActive = keys.q;
   player2.shieldActive = keys.m;
   updateDirection();
@@ -259,8 +258,7 @@ function drawPlayers() {
 }
 
 function drawTopStatus() {
-  // Increased bar dimensions for improved UI.
-  const barWidth = 300, barHeight = 20;
+  const barWidth = 200, barHeight = 30;
   const leftX = 20, topY = 20;
   const rightX = canvas.width - barWidth - 20;
   
@@ -270,11 +268,12 @@ function drawTopStatus() {
   ctx.strokeStyle = "white";
   ctx.strokeRect(leftX, topY, barWidth, barHeight);
   
-  // Health text (increased font size)
-  ctx.font = "20px Arial";
-  ctx.textAlign = "left";
+  // Health text inside health bar (centered)
+  ctx.font = "bold 20px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
   ctx.fillStyle = "white";
-  ctx.fillText("Health: " + player1.health + "%", leftX + 5, topY + 22);
+  ctx.fillText("Health: " + player1.health + "%", leftX + barWidth/2, topY + barHeight/2);
   
   // --- Player 1 Shield Bar ---
   let shieldColor1 = player1.shield > 0
@@ -289,20 +288,19 @@ function drawTopStatus() {
   ctx.strokeStyle = "white";
   ctx.strokeRect(leftX, topY + barHeight + 5, barWidth, barHeight);
   
-  // Shield text (increased font size)
+  // Shield text inside shield bar (centered)
   ctx.fillStyle = "white";
-  ctx.fillText("Shield: " + player1.shield + "% 🛡️", leftX + 5, topY + (barHeight * 2) + 12);
+  ctx.fillText("Shield: " + player1.shield + "% 🛡️", leftX + barWidth/2, topY + barHeight + 5 + barHeight/2);
   
-  // Draw a border around health/shield if shield is active (thicker border)
+  // Draw a border around both bars if shield is active
   if (player1.shieldActive) {
     ctx.strokeStyle = "cyan";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(leftX - 2, topY - 2, barWidth + 4, barHeight * 2 + 9);
-    ctx.lineWidth = 1; // Reset line width
+    ctx.lineWidth = 3;
+    ctx.strokeRect(leftX - 2, topY - 2, barWidth + 4, (barHeight * 2) + 5 + 4);
+    ctx.lineWidth = 1;
   }
   
   // --- Player 2 Health Bar ---
-  ctx.textAlign = "right";
   ctx.fillStyle = "red";
   ctx.fillRect(rightX, topY, (player2.health / 100) * barWidth, barHeight);
   ctx.strokeStyle = "white";
@@ -310,7 +308,7 @@ function drawTopStatus() {
   
   // Health text for Player 2
   ctx.fillStyle = "white";
-  ctx.fillText("Health: " + player2.health + "%", rightX + barWidth - 5, topY + 22);
+  ctx.fillText("Health: " + player2.health + "%", rightX + barWidth/2, topY + barHeight/2);
   
   // --- Player 2 Shield Bar ---
   let shieldColor2 = player2.shield > 0
@@ -327,23 +325,26 @@ function drawTopStatus() {
   
   // Shield text for Player 2
   ctx.fillStyle = "white";
-  ctx.fillText("Shield: " + player2.shield + "% 🛡️", rightX + barWidth - 5, topY + (barHeight * 2) + 12);
+  ctx.fillText("Shield: " + player2.shield + "% 🛡️", rightX + barWidth/2, topY + barHeight + 5 + barHeight/2);
   
   if (player2.shieldActive) {
     ctx.strokeStyle = "orange";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(rightX - 2, topY - 2, barWidth + 4, barHeight * 2 + 9);
+    ctx.lineWidth = 3;
+    ctx.strokeRect(rightX - 2, topY - 2, barWidth + 4, (barHeight * 2) + 5 + 4);
     ctx.lineWidth = 1;
   }
   
-  // --- Player Names (displayed centered below shield bars with increased font size) ---
+  // --- Player Names (centered below shield bars) ---
   ctx.font = "bold 24px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "blue";
-  ctx.fillText("🟦 " + p1Name, leftX + barWidth / 2, topY + (barHeight * 2) + 50);
+  ctx.fillText("🟦 " + p1Name, leftX + barWidth/2, topY + (barHeight * 2) + 5 + 40);
   ctx.fillStyle = "red";
-  ctx.fillText("🟥 " + p2Name, rightX + barWidth / 2, topY + (barHeight * 2) + 50);
-  ctx.textAlign = "left"; // Reset alignment
+  ctx.fillText("🟥 " + p2Name, rightX + barWidth/2, topY + (barHeight * 2) + 5 + 40);
+  
+  // Reset text alignment and baseline
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
 }
 
 // Note: drawControls() is no longer called since controls are shown below the canvas via HTML.
@@ -352,7 +353,7 @@ function drawTopStatus() {
    ANIMATION & GAME LOOP
 ----------------------------- */
 function dropAnimation(callback) {
-  const dropSpeed = 5;
+  const dropSpeed = 5; 
   // New destination: drop to near the bottom of canvas.
   const destinationY = canvas.height - player1.height - 50;
   function animate() {
@@ -393,8 +394,7 @@ function updateShields() {
   const players = [player1, player2];
   players.forEach(player => {
     if (player.shieldActive && player.shield > 0) {
-      // Reduced depletion rate for shield.
-      player.shield -= 0.3;
+      player.shield -= 0.5;
       if (player.shield <= 0) {
         player.shield = 0;
         player.shieldActive = false;
@@ -487,9 +487,8 @@ function duoStartGame() {
   startBackgroundMusic();
   
   // Set players off-screen for drop animation.
-  // Adjusted starting positions so they drop from different heights.
-  player1.y = -player1.height - 20;
-  player2.y = -player2.height - 100;
+  player1.y = -player1.height;
+  player2.y = -player2.height;
   
   dropAnimation(() => {
     gameLoop();
@@ -501,7 +500,25 @@ function restartGame() {
 }
 
 function playAgain() {
-  restartGame();
+  // Instead of reloading the page, reset game state and replay the duo mode.
+  document.getElementById("gameOverScreen").classList.add("hidden");
+  gamePaused = false;
+  gameRunning = true;
+  player1.health = 100;
+  player1.shield = 100;
+  player1.shieldActive = false;
+  player1.shieldBroken = false;
+  player2.health = 100;
+  player2.shield = 100;
+  player2.shieldActive = false;
+  player2.shieldBroken = false;
+  bullets = [];
+  // Reset player positions for drop animation.
+  player1.y = -player1.height;
+  player2.y = -player2.height;
+  dropAnimation(() => {
+    gameLoop();
+  });
 }
 
 function togglePause() {
